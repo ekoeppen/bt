@@ -1,0 +1,14 @@
+image: alpine/edge
+packages:
+  - go
+secrets:
+  - ca99d209-296a-41b7-9eda-454250e4b901
+environment:
+  REPO: bt
+sources:
+  - https://git.sr.ht/~ekoeppen/build-scripts
+tasks:
+  - build: |
+      cd $REPO
+      go build ./cmd/bt
+  - mirror-to-github: ./build-scripts/github-mirror $REPO
