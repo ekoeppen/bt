@@ -2,7 +2,7 @@ package state
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	t "github.com/ekoeppen/bt/internal/tree"
+	t "git.sr.ht/~ekoeppen/bt/internal/tree"
 	"os"
 	"os/exec"
 )

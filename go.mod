@@ -1,4 +1,4 @@
-module github.com/ekoeppen/bt
+module git.sr.ht/~ekoeppen/bt
 
 go 1.22.2
 

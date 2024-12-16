@@ -10,7 +10,7 @@ Modified version of [bt](https://github.com/LeperGnome/bt):
 ## Installation
 
 ```bash
-go install github.com/ekoeppen/bt/cmd/bt@latest
+go install git.sr.ht/~ekoeppen/bt/cmd/bt@latest
 ```
 
 Or from source

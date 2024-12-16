@@ -9,9 +9,9 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/ekoeppen/bt/internal/state"
-	t "github.com/ekoeppen/bt/internal/tree"
-	"github.com/ekoeppen/bt/pkg/stack"
+	"git.sr.ht/~ekoeppen/bt/internal/state"
+	t "git.sr.ht/~ekoeppen/bt/internal/tree"
+	"git.sr.ht/~ekoeppen/bt/pkg/stack"
 )
 
 const (

@@ -7,9 +7,9 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/ekoeppen/bt/internal/state"
-	"github.com/ekoeppen/bt/internal/tree"
-	ui "github.com/ekoeppen/bt/internal/ui"
+	"git.sr.ht/~ekoeppen/bt/internal/state"
+	"git.sr.ht/~ekoeppen/bt/internal/tree"
+	ui "git.sr.ht/~ekoeppen/bt/internal/ui"
 )
 
 type model struct {
