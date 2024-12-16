@@ -5,14 +5,13 @@ import (
 	"math"
 	"os"
 	"strings"
-	"time"
 	"unicode/utf8"
 
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/LeperGnome/bt/internal/state"
-	t "github.com/LeperGnome/bt/internal/tree"
-	"github.com/LeperGnome/bt/pkg/stack"
+	"github.com/ekoeppen/bt/internal/state"
+	t "github.com/ekoeppen/bt/internal/tree"
+	"github.com/ekoeppen/bt/pkg/stack"
 )
 
 const (
@@ -30,12 +29,12 @@ const (
 
 	tooSmall                 = "too small =("
 	binaryContentPlaceholder = "<binary content>"
-	helpPreview              = "Press ? to toggle help"
 )
 
 type Renderer struct {
 	Style       Stylesheet
 	EdgePadding int
+	Preview     bool
 	offsetMem   int
 	previewBuff [previewBytesLimit]byte
 }
@@ -49,16 +48,20 @@ func (r *Renderer) Render(s *state.State, winHeight, winWidth int) string {
 
 	// section is half a screen, devided vertically
 	// left for tree, right for file preview
-	sectionWidth := int(math.Floor(0.5 * float64(winWidth)))
+	var sectionWidth int
+	if r.Preview {
+		sectionWidth = int(math.Floor(0.5 * float64(winWidth)))
+	} else {
+		sectionWidth = winWidth
+	}
 
 	renderedTree := r.renderTree(s.Tree, winHeight-headLen, sectionWidth)
 
 	var rightPane string
 
 	if s.HelpToggle {
-		renderedHelp, helpLen := r.renderHelp(sectionWidth)
-		renderedContent := r.renderSelectedFileContent(s.Tree, winHeight-headLen-helpLen, sectionWidth)
-		rightPane = lipgloss.JoinVertical(lipgloss.Left, renderedHelp, renderedContent)
+		renderedContent := r.renderSelectedFileContent(s.Tree, winHeight-headLen, sectionWidth)
+		rightPane = lipgloss.JoinVertical(lipgloss.Left, renderedContent)
 	} else {
 		renderedContent := r.renderSelectedFileContent(s.Tree, winHeight-headLen, sectionWidth)
 		rightPane = renderedContent
@@ -74,21 +77,6 @@ func (r *Renderer) Render(s *state.State, winHeight, winWidth int) string {
 }
 
 func (r *Renderer) renderHeading(s *state.State, width int) (string, int) {
-	selected := s.Tree.GetSelectedChild()
-
-	// NOTE: special case for empty dir
-	path := s.Tree.CurrentDir.Path + "/..."
-	changeTime := "--"
-	size := "0 B"
-	perm := "--"
-
-	if selected != nil {
-		path = selected.Path
-		changeTime = selected.Info.ModTime().Format(time.RFC822)
-		size = formatSize(float64(selected.Info.Size()), 1024.0)
-		perm = selected.Info.Mode().String()
-	}
-
 	markedPath := ""
 	if s.Tree.Marked != nil {
 		markedPath = s.Tree.Marked.Path
@@ -103,54 +91,11 @@ func (r *Renderer) renderHeading(s *state.State, width int) (string, int) {
 		operationBar += fmt.Sprintf(" │ %s │", r.Style.OperationBarInput.Render(string(s.InputBuf)))
 	}
 
-	rawPath := "> " + path
-
-	finfo := fmt.Sprintf(
-		"%s %s %v %s %s",
-		r.Style.FinfoPermissions.Render(perm),
-		r.Style.FinfoSep.Render("│"),
-		r.Style.FinfoLastUpdated.Render(changeTime),
-		r.Style.FinfoSep.Render("│"),
-		r.Style.FinfoSize.Render(size),
-	)
-
 	header := []string{
-		r.Style.SelectedPath.Render(rawPath) +
-			strings.Repeat(
-				" ",
-				max(width-utf8.RuneCountInString(rawPath)-utf8.RuneCountInString(helpPreview), 0),
-			) +
-			r.Style.HelpMsg.Render(helpPreview),
-		finfo,
 		r.Style.OperationBar.Render(operationBar),
 		r.Style.ErrBar.Render(s.ErrBuf),
 	}
 	return strings.Join(header, "\n"), len(header)
-}
-
-func (r *Renderer) renderHelp(width int) (string, int) {
-	help := []string{
-		"j / arr down   Select next child",
-		"k / arr up     Select previous child",
-		"h / arr left   Move up a dir",
-		"l / arr right  Enter selected directory",
-		"if / id	    Create file (if) / directory (id) in current directory",
-		"d              Move selected child (then 'p' to paste)",
-		"y              Copy selected child (then 'p' to paste)",
-		"D              Delete selected child",
-		"r              Rename selected child",
-		"e              Edit selected file in $EDITOR",
-		"gg             Go to top most child in current directory",
-		"G              Go to last child in current directory",
-		"enter          Collapse / expand selected directory",
-		"esc            Clear error message / stop current operation",
-		"q / ctrl+c     Exit",
-	}
-	return r.Style.
-		HelpContent.
-		MaxWidth(width).
-		MarginRight(width).
-		Render(strings.Join(help, "\n")), len(help) + 1 // +1 for border
 }
 
 func (r *Renderer) renderTree(tree *t.Tree, height, width int) string {
@@ -166,6 +111,9 @@ func (r *Renderer) renderTree(tree *t.Tree, height, width int) string {
 }
 
 func (r *Renderer) renderSelectedFileContent(tree *t.Tree, height, width int) string {
+	if !r.Preview {
+		return ""
+	}
 	n, err := tree.ReadSelectedChildContent(r.previewBuff[:], previewBytesLimit)
 	if err != nil {
 		return ""
@@ -245,14 +193,16 @@ func (r *Renderer) renderTreeFull(tree *t.Tree, width int) ([]string, int) {
 		nameRuneCountNoStyle := utf8.RuneCountInString(name)
 		indentRuneCount := utf8.RuneCountInString(indent)
 
-		if nameRuneCountNoStyle+indentRuneCount > width-6 { // 6 = len([]rune{"... <-"})
-			name = string([]rune(name)[:max(0, width-indentRuneCount-6)]) + "..."
+		if nameRuneCountNoStyle+indentRuneCount > width {
+			name = string([]rune(name)[:max(0, width-indentRuneCount)]) + "..."
 		}
 
 		indent = r.Style.TreeIndent.Render(indent)
 
-		if node.Info.IsDir() {
-			name = r.Style.TreeDirecotryName.Render(name)
+		if tree.GetSelectedChild() == node {
+			name = r.Style.TreeSelectionLine.Render(name)
+		} else if node.Info.IsDir() {
+			name = r.Style.TreeDirectoryName.Render(name)
 		} else if node.Info.Mode()&os.ModeSymlink == os.ModeSymlink {
 			name = r.Style.TreeLinkName.Render(name)
 		} else {
@@ -265,10 +215,6 @@ func (r *Renderer) renderTreeFull(tree *t.Tree, width int) ([]string, int) {
 
 		repr := indent + name
 
-		if tree.GetSelectedChild() == node {
-			repr += r.Style.TreeSelectionArrow.Render(arrow)
-			currentLine = linen
-		}
 		lines = append(lines, repr)
 
 		if node.Children != nil {

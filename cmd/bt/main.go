@@ -7,9 +7,9 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/LeperGnome/bt/internal/state"
-	"github.com/LeperGnome/bt/internal/tree"
-	ui "github.com/LeperGnome/bt/internal/ui"
+	"github.com/ekoeppen/bt/internal/state"
+	"github.com/ekoeppen/bt/internal/tree"
+	ui "github.com/ekoeppen/bt/internal/ui"
 )
 
 type model struct {
@@ -40,12 +40,12 @@ func (m model) View() string {
 	return m.renderer.Render(m.appState, m.windowHeight, m.windowWidth)
 }
 
-func newModel(root string, pad int, style ui.Stylesheet) (model, error) {
+func newModel(root string, pad int, preview bool, style ui.Stylesheet) (model, error) {
 	s, err := state.InitState(root)
 	if err != nil {
 		return model{}, err
 	}
-	renderer := &ui.Renderer{EdgePadding: pad, Style: style}
+	renderer := &ui.Renderer{EdgePadding: pad, Style: style, Preview: preview}
 	return model{
 		appState: s,
 		renderer: renderer,
@@ -61,13 +61,14 @@ func listenFSEvents(eventsChan <-chan tree.NodeChange) tea.Cmd {
 func main() {
 	paddingPtr := flag.Uint("pad", 5, "Edge padding for top and bottom")
 	inlinePtr := flag.Bool("i", false, "In-place render (without alternate screen)")
+	previewPtr := flag.Bool("p", false, "Enable preview")
 	flag.Parse()
 	rootPath := flag.Arg(0)
 	if rootPath == "" {
 		rootPath = "."
 	}
 
-	m, err := newModel(rootPath, int(*paddingPtr), ui.DefaultStylesheet)
+	m, err := newModel(rootPath, int(*paddingPtr), bool(*previewPtr), ui.SolarizedTerm)
 	if err != nil {
 		fmt.Printf("Error on init: %v", err)
 		os.Exit(1)

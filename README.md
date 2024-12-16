@@ -1,13 +1,16 @@
-# Better tree (arguably)
+# A fork of Better tree (arguably)
 
-Manipulate file tree in terminal.
+Modified version of [bt](https://github.com/LeperGnome/bt):
 
-<img alt="Preview" src="assets/preview.gif" width="600" />
+- Solarized theme (terminal colors need to be set to Solarized!)
+- Make preview optional
+- Remove file info header
+- Remove help
 
 ## Installation
 
 ```bash
-go install github.com/LeperGnome/bt/cmd/bt@v1.0.0
+go install github.com/ekoeppen/bt/cmd/bt@latest
 ```
 
 Or from source
@@ -25,6 +28,7 @@ Flags:
   -i    In-place render (without alternate screen)
   -pad uint
         Edge padding for top and bottom (default 5)
+  -p    Enable preview
 ```
 
 Key bindings:
@@ -50,56 +54,3 @@ Key bindings:
 
 ## Motivation
 
-I find myself disliking a majority of column-based terminal file managers.
-The reason for that is - when I need to copy/move some files across nested subdirectories, 
-I constantly lose context of where I am currently, because columns always go left and right. 
-Even though those file managers are really mature and loaded with features (e.g. [ranger](https://github.com/ranger/ranger), [lf](https://github.com/gokcehan/lf), [xplr](https://github.com/sayanarijit/xplr), [nnn](https://github.com/jarun/nnn)), it's uneasy for me to perform simple tasks.
-
-I like how [broot](https://github.com/Canop/broot) renders the ui, but I guess that it's mainly usable for exploring a file tree, but not manipulating it (at least I found it this way, when I had to type a target directory for `move`).
-
-That's why I'm writing my own simple tool for simple use cases. It's currently lacking a bunch of features (see todo list below), but the fundamentals are here.
-
-## TODO
-```
-Functional:
-- [x] Tree rendering
-- [x] File preview
-- [x] Scrolling trees, that don't fit the screen
-- [x] Move files
-- [x] Jump into empty directories
-- [x] Copy / paste files
-- [x] Not reading whole file contents, only fix size
-- [x] Remove files
-- [~] Resolve filename conflicts (kinda done)
-- [x] Sorting
-- [x] "G" to go bottom and "gg" to go top
-- [x] Creating files and directories
-- [x] Renaming files and directories
-- [x] Handle fs updates
-- [~] Error handling (permissions denied, etc) (kinda)
-- [x] File permission in status bar
-- [x] Stylesheets
-- [x] Edit selected file in editor of choice
-- [x] Help
-- [ ] Toggle hidden directories
-- [ ] Image preview
-- [ ] Custom opening files
-- [ ] Custom delete cmd
-- [ ] Mark multiple files
-- [ ] Search
-- [ ] Marked to stdout on exit
-- [ ] Jump to current directory
-- [ ] Go higher then local root
-- [ ] Make current directory a local root
-
-Fixes:
-- [x] Fix size notation
-- [ ] File preview ignore control chars
-
-Maintenance:
-- [ ] Release artifacts
-- [ ] Tests
-- [ ] CI
-- [ ] Distribution
-- [ ] CONTRIBUTING.md
-```

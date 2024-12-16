@@ -19,10 +19,11 @@ type Stylesheet struct {
 	HelpContent lipgloss.Style
 
 	TreeRegularFileName lipgloss.Style
-	TreeDirecotryName   lipgloss.Style
+	TreeDirectoryName   lipgloss.Style
 	TreeLinkName        lipgloss.Style
 	TreeMarkedNode      lipgloss.Style
 	TreeSelectionArrow  lipgloss.Style
+	TreeSelectionLine   lipgloss.Style
 	TreeIndent          lipgloss.Style
 
 	ContentPreview lipgloss.Style
@@ -49,19 +50,56 @@ var DefaultStylesheet = Stylesheet{
 		BorderLeft(true),
 
 	TreeRegularFileName: lipgloss.NewStyle().Foreground(lipgloss.Color("#E6E6E6")),
-	TreeDirecotryName:   lipgloss.NewStyle().Foreground(lipgloss.Color("#6D74AC")),
+	TreeDirectoryName:   lipgloss.NewStyle().Foreground(lipgloss.Color("#6D74AC")),
 	TreeLinkName:        lipgloss.NewStyle().Foreground(lipgloss.Color("#6DACA4")),
 	TreeMarkedNode: lipgloss.NewStyle().
 		BorderLeft(true).
 		BorderStyle(lipgloss.InnerHalfBlockBorder()).
 		Background(lipgloss.Color("#363636")),
 	TreeSelectionArrow: lipgloss.NewStyle().Foreground(lipgloss.Color("#ACA46D")),
+	TreeSelectionLine:  lipgloss.NewStyle().Foreground(lipgloss.Color("#ACA46D")),
 	TreeIndent:         lipgloss.NewStyle().Foreground(lipgloss.Color("#363636")),
 
 	ContentPreview: lipgloss.NewStyle().
 		Italic(true).
 		Foreground(lipgloss.Color("#a8a8a8")).
 		BorderForeground(lipgloss.Color("#363636")).
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderLeft(true),
+}
+
+var SolarizedTerm = Stylesheet{
+	SelectedPath: lipgloss.NewStyle().Foreground(lipgloss.Color("10")),
+
+	FinfoPermissions: lipgloss.NewStyle().Foreground(lipgloss.Color("0")),
+	FinfoLastUpdated: lipgloss.NewStyle().Foreground(lipgloss.Color("0")),
+	FinfoSize:        lipgloss.NewStyle().Foreground(lipgloss.Color("0")),
+	FinfoSep:         lipgloss.NewStyle().Foreground(lipgloss.Color("0")),
+
+	OperationBar:      lipgloss.NewStyle().Foreground(lipgloss.Color("0")),
+	OperationBarInput: lipgloss.NewStyle().Background(lipgloss.Color("0")),
+
+	ErrBar:  lipgloss.NewStyle().Foreground(lipgloss.Color("0")),
+	HelpMsg: lipgloss.NewStyle().Foreground(lipgloss.Color("0")),
+	HelpContent: lipgloss.NewStyle().
+		Foreground(lipgloss.Color("0")).
+		BorderForeground(lipgloss.Color("0")).
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderBottom(true).
+		BorderLeft(true),
+
+	TreeRegularFileName: lipgloss.NewStyle().Foreground(lipgloss.Color("11")),
+	TreeDirectoryName:   lipgloss.NewStyle().Foreground(lipgloss.Color("4")),
+	TreeLinkName:        lipgloss.NewStyle().Foreground(lipgloss.Color("6")),
+	TreeMarkedNode:      lipgloss.NewStyle().Background(lipgloss.Color("7")),
+	TreeSelectionArrow:  lipgloss.NewStyle().Foreground(lipgloss.Color("10")),
+	TreeSelectionLine:   lipgloss.NewStyle().Foreground(lipgloss.Color("1")).Background(lipgloss.Color("7")),
+	TreeIndent:          lipgloss.NewStyle().Foreground(lipgloss.Color("0")),
+
+	ContentPreview: lipgloss.NewStyle().
+		Italic(true).
+		Foreground(lipgloss.Color("0")).
+		BorderForeground(lipgloss.Color("0")).
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderLeft(true),
 }

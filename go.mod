@@ -1,4 +1,4 @@
-module github.com/LeperGnome/bt
+module github.com/ekoeppen/bt
 
 go 1.22.2
 
